@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatroom</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="chat-container">
+        <div id="chat-window">
+            <ul id="chat-messages"></ul>
+        </div>
+        <form id="chat-form">
+            <input type="email" id="email" placeholder="Voer je e-mail in" required>
+            <input type="text" id="message" placeholder="Typ een bericht" required>
+            <button type="submit">Verstuur</button>
+        </form>
+    </div>
+    
+    <div id="gif-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="gif-results"></div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const chatForm = document.getElementById("chat-form");
+            const chatMessages = document.getElementById("chat-messages");
+            const emailInput = document.getElementById("email");
+            const messageInput = document.getElementById("message");
+            const gifModal = document.getElementById("gif-modal");
+            const gifResults = document.getElementById("gif-results");
+            const closeModal = document.querySelector(".close");
+
+            function fetchGravatar(email) {
+                const hash = md5(email.trim().toLowerCase());
+                return `https://www.gravatar.com/avatar/${hash}?d=identicon`;
+            }
+
+            function saveChat() {
+                localStorage.setItem("chatMessages", chatMessages.innerHTML);
+            }
+
+            function loadChat() {
+                chatMessages.innerHTML = localStorage.getItem("chatMessages") || "";
+            }
+
+            loadChat();
+
+            chatForm.addEventListener("submit", (event) => {
+                event.preventDefault();
+                const email = emailInput.value;
+                const message = messageInput.value;
+                if (!email || !message) return;
+
+                const li = document.createElement("li");
+                const img = document.createElement("img");
+                img.src = fetchGravatar(email);
+                img.alt = "Profielfoto";
+                img.title = email;
+                li.appendChild(img);
+                li.appendChild(document.createTextNode(message));
+                chatMessages.appendChild(li);
+                saveChat();
+
+                messageInput.value = "";
+            });
+
+            chatMessages.addEventListener("dblclick", (event) => {
+                if (event.target.tagName === "LI") {
+                    gifModal.style.display = "block";
+                    fetch("https://api.giphy.com/v1/gifs/trending?api_key=YOUR_GIPHY_API_KEY&limit=5")
+                        .then(response => response.json())
+                        .then(data => {
+                            gifResults.innerHTML = "";
+                            data.data.forEach(gif => {
+                                const img = document.createElement("img");
+                                img.src = gif.images.fixed_height.url;
+                                img.addEventListener("click", () => {
+                                    event.target.appendChild(img.cloneNode());
+                                    gifModal.style.display = "none";
+                                    saveChat();
+                                });
+                                gifResults.appendChild(img);
+                            });
+                        });
+                }
+            });
+
+            closeModal.addEventListener("click", () => {
+                gifModal.style.display = "none";
+            });
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.18.0/js/md5.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #chat-container { max-width: 500px; margin: auto; }
+        #chat-window { border: 1px solid #ccc; height: 300px; overflow-y: auto; }
+        #chat-messages { list-style: none; padding: 0; }
+        li { display: flex; align-items: center; padding: 5px; }
+        li img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; padding: 20px; margin: 10% auto; width: 300px; }
+        .close { cursor: pointer; float: right; }
+        #gif-results img { width: 100px; cursor: pointer; margin: 5px; }
+    </style>
+</body>
+</html>

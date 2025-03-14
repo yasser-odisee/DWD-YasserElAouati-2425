@@ -1,0 +1,16 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: beige;
+}
+#text {
+    font-size: 16px;
+    margin: 20px auto;
+    width: 50%;
+    text-align: left; /* Added */
+}
+label {
+    margin-bottom: 10px;
+}
+input[type="range"] {
+    width: 30%;
+}

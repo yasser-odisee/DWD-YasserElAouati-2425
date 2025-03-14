@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatroom</title>
+  <style>
+    /* Algemene stijlen */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      width: 400px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .chat-form {
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      background-color: #f9f9f9;
+    }
+
+    .chat-form input,
+    .chat-form textarea {
+      margin-bottom: 8px;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .chat-form button {
+      padding: 8px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .chat-form button:hover {
+      background-color: #218838;
+    }
+
+    /* Modal stijlen */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      padding: 16px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 500px;
+      position: relative;
+    }
+
+    .close {
+      position: absolute;
+      top: 8px;
+      right: 16px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .gif-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .gif-container img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      cursor: pointer;
+    }
+
+    /* Tooltip stijlen */
+    [data-tooltip] {
+      position: relative;
+    }
+
+    [data-tooltip]:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #333;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <!-- Chatberichten worden hier dynamisch toegevoegd -->
+    <div id="chat-messages" class="chat-messages"></div>
+
+    <!-- Formulier voor het toevoegen van berichten -->
+    <form id="chat-form" class="chat-form">
+      <input type="email" id="email" placeholder="Voer je e-mailadres in" required>
+      <textarea id="message" placeholder="Typ je bericht..." required></textarea>
+      <button type="submit">Verzenden</button>
+    </form>
+  </div>
+
+  <!-- Modal voor GIF-selectie -->
+  <div id="gif-modal" class="modal">
+    <div class="modal-content">
+      <span id="close-modal" class="close">&times;</span>
+      <div id="gif-container" class="gif-container"></div>
+    </div>
+  </div>
+
+  <script>
+    // Elementen uit de DOM halen
+    const chatForm = document.getElementById('chat-form');
+    const chatMessages = document.getElementById('chat-messages');
+    const emailInput = document.getElementById('email');
+    const messageInput = document.getElementById('message');
+    const gifModal = document.getElementById('gif-modal');
+    const closeModal = document.getElementById('close-modal');
+    const gifContainer = document.getElementById('gif-container');
+
+    // Gravatar API URL
+    const GRAVATAR_URL = 'https://www.gravatar.com/avatar/';
+    const DEFAULT_AVATAR = 'https://www.gravatar.com/avatar/?d=identicon';
+
+    // Giphy API sleutel en URL
+    const GIPHY_API_KEY = 'YOUR_GIPHY_API_KEY'; // Vervang dit door je eigen Giphy API-sleutel
+    const GIPHY_API_URL = `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&limit=5&q=`;
+
+    // LocalStorage sleutel
+    const STORAGE_KEY = 'chatroom_data';
+
+    // Laad opgeslagen chatgeschiedenis
+    loadChatHistory();
+
+    // Event listener voor het formulier
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = emailInput.value.trim();
+      const message = messageInput.value.trim();
+
+      if (email && message) {
+        addMessage(email, message);
+        saveChatHistory();
+        chatForm.reset();
+      }
+    });
+
+    // Voeg een bericht toe aan de chat
+    function addMessage(email, message) {
+      const avatarUrl = getGravatarUrl(email);
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+      messageElement.innerHTML = `
+        <img src="${avatarUrl}" alt="Avatar" data-tooltip="${email}">
+        <p>${message}</p>
+      `;
+      chatMessages.appendChild(messageElement);
+
+      // Scroll naar beneden
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      // Voeg dubbelklik-event toe aan berichten
+      messageElement.querySelector('p').addEventListener('dblclick', (e) => {
+        const word = e.target.textContent;
+        showGifModal(word);
+      });
+    }
+
+    // Haal Gravatar URL op
+    function getGravatarUrl(email) {
+      const hash = md5(email.trim().toLowerCase()); // MD5 hash van het e-mailadres
+      return `${GRAVATAR_URL}${hash}?d=${encodeURIComponent(DEFAULT_AVATAR)}`;
+    }
+
+    // Toon GIF-modal
+    function showGifModal(query) {
+      gifContainer.innerHTML = ''; // Leeg de container
+      fetch(GIPHY_API_URL + query)
+        .then((response) => response.json())
+        .then((data) => {
+          data.data.forEach((gif) => {
+            const img = document.createElement('img');
+            img.src = gif.images.fixed_height.url;
+            img.addEventListener('click', () => {
+              addMessage(emailInput.value.trim(), `<img src="${gif.images.fixed_height.url}" alt="GIF">`);
+              gifModal.style.display = 'none';
+            });
+            gifContainer.appendChild(img);
+          });
+        });
+      gifModal.style.display = 'flex';
+    }
+
+    // Sluit de modal
+    closeModal.addEventListener('click', () => {
+      gifModal.style.display = 'none';
+    });
+
+    // Sla chatgeschiedenis op in LocalStorage
+    function saveChatHistory() {
+      const chatData = {
+        email: emailInput.value.trim(),
+        messages: Array.from(chatMessages.children).map((message) => message.innerHTML),
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(chatData));
+    }
+
+    // Laad chatgeschiedenis uit LocalStorage
+    function loadChatHistory() {
+      const chatData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (chatData) {
+        emailInput.value = chatData.email;
+        chatData.messages.forEach((message) => {
+          const messageElement = document.createElement('div');
+          messageElement.classList.add('message');
+          messageElement.innerHTML = message;
+          chatMessages.appendChild(messageElement);
+        });
+      }
+    }
+
+    // MD5-functie voor Gravatar (vereist voor hashing)
+    function md5(string) {
+      return CryptoJS.MD5(string).toString();
+    }
+  </script>
+  <!-- CryptoJS voor MD5-hashing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</body>
+</html>
