@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tekststijl Configuratie</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div>
+        <label for="fontSizeRange">Lettergrootte:</label>
+        <input type="range" id="fontSizeRange" min="10" max="40" value="16" step="1">
+    </div>
+
+    <div>
+        <label for="fontColorPicker">Tekstkleur:</label>
+        <input type="color" id="fontColorPicker" value="#000000">
+    </div>
+
+    <div>
+        <label for="bold">Vet</label>
+        <input type="checkbox" id="bold" name="vet">
+    </div>
+    <div>
+        <label for="italic">Schuin</label>
+        <input type="checkbox" id="italic" name="schuin">
+    </div>
+    <div>
+        <label for="uppercase">Hoofdletters</label>
+        <input type="checkbox" id="uppercase" name="hoofdletters">
+    </div>
+    <button type="button" id="stijl1">stijl 1</button>
+    <button type="button" id="stijl2">stijl 2</button>
+    <button type="button" id="stijl3">stijl 3</button>
+    <p id="text">There are many variations of passages of Lorem Ipsum available, but the majority have suffered
+        alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If
+        you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in
+        the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as
+        necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words,
+        combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The
+        generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words
+        etc.
+    </p>
+    <script src="js/script.js"></script>
+</body>
+</html>
