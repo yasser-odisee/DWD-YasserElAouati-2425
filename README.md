@@ -1,1 +1,7 @@
-# DWD-YasserElAouati-2425
+# Dynamic Web Development
+
+- Academiejaar: 
+- Opleiding: 
+- Klasgroep: 
+- Naam: 
+

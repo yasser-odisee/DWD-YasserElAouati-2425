@@ -24,20 +24,18 @@ italicCheckbox.addEventListener('change', () => {
 uppercaseCheckbox.addEventListener('change', () => {
     text.style.textTransform = uppercaseCheckbox.checked ? 'uppercase' : 'none';
 });
-//chatgpt gebruikt voor de buttons omdat ik niet zo goed wist wat ik moest doen maar heb het nu wel begrepen.
-document.querySelector("#stijl1").addEventListener("click", function() {
-    var textElement = document.querySelector("#text");
-    textElement.style.textShadow = "2px 2px 5px rgba(0, 0, 0, 0.5)";
+
+// Stijlknoppen
+document.querySelector("#stijl1").addEventListener("click", () => {
+    text.style.textShadow = "2px 2px 5px rgba(0, 0, 0, 0.5)";
 });
 
-document.querySelector("#stijl2").addEventListener("click", function() {
-    var textElement = document.querySelector("#text");
-    textElement.style.backgroundImage = "linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)";
-    textElement.style.color = "transparent";
-    textElement.style.webkitBackgroundClip = "text";
+document.querySelector("#stijl2").addEventListener("click", () => {
+    text.style.backgroundImage = "linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)";
+    text.style.color = "transparent";
+    text.style.backgroundClip = "text";
 });
 
-document.querySelector("#stijl3").addEventListener("click", function() {
-    var textElement = document.querySelector("#text");
-    textElement.style.transform = "scaleX(-1)";
+document.querySelector("#stijl3").addEventListener("click", () => {
+    text.style.transform = "scaleX(-1)";
 });
