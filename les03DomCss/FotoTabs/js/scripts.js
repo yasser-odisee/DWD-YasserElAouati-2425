@@ -19,7 +19,7 @@ function filterPhotos(filter) {
 }
 
 // Filter buttons event listener
-document.querySelectorAll('.nav__filters a').forEach(link => {
+document.querySelectorAll('.nav__filters a').forEach(link => { 
 	link.addEventListener('click', function(e) {
 		e.preventDefault();
 		document.querySelector('.nav__filters a.active').classList.remove('active');
