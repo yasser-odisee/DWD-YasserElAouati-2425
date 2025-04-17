@@ -1,39 +1,51 @@
-// Elementen selecteren
-const form = document.querySelector(".chat-form");
-const emailInput = document.getElementById("email");
-const commentInput = document.getElementById("comment");
-const chatlog = document.querySelector(".chatlog");
 
-// Eventlistener voor het formulier
-form.addEventListener("submit", function(e) {
-  e.preventDefault(); // voorkom herladen van pagina
+const chatForm = document.querySelector('#chat-form');
+const chatMessages = document.querySelector('#chat-messages');
+const emailInput = document.querySelector('#email');
+const messageInput = document.querySelector('#message');
+
+// Gravatar API
+const GRAVATAR_URL = 'https://www.gravatar.com/avatar/';
+const DEFAULT_AVATAR = 'https://www.gravatar.com/avatar/?d=identicon';
+
+// MD5-hashfunctie (vereist CryptoJS bibliotheek, zie onderaan)
+function md5(string) {
+  return CryptoJS.MD5(string.trim().toLowerCase()).toString();
+}
+
+// Gravatar-profiel ophalen
+function getGravatarUrl(email) {
+  const hash = md5(email);
+  return `${GRAVATAR_URL}${hash}?d=${encodeURIComponent(DEFAULT_AVATAR)}`;
+}
+
+// Bericht toevoegen
+function addMessage(email, message) {
+  const avatarUrl = getGravatarUrl(email);
+  const messageElement = document.createElement('div');
+  messageElement.classList.add('message');
+
+  messageElement.innerHTML = `
+    <img src="${avatarUrl}" alt="Avatar" data-tooltip="${email}">
+    <p>${message}</p>
+  `;
+
+  chatMessages.appendChild(messageElement);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Event: formulier verzenden
+chatForm.addEventListener('submit', (e) => {
+  e.preventDefault();
 
   const email = emailInput.value.trim();
-  const comment = commentInput.value.trim();
+  const message = messageInput.value.trim();
 
-  // Formchecking
-  if (email === "" || comment === "") {
-    alert("Vul een e-mailadres en een comment in.");
+  if (!email || !message) {
+    alert("Vul zowel je e-mailadres als een bericht in.");
     return;
   }
 
-  // Chatbericht aanmaken
-  const bericht = document.createElement("div");
-  bericht.className = "chat-message";
-
-  const avatar = document.createElement("img");
-  avatar.src = "https://www.gravatar.com/avatar/?d=mp"; // standaard avatar
-  avatar.alt = "User avatar";
-
-  const tekst = document.createElement("p");
-  tekst.textContent = comment;
-
-  // Samenstellen
-  bericht.appendChild(avatar);
-  bericht.appendChild(tekst);
-  chatlog.appendChild(bericht);
-
-
-  // Formulier wissen
-  commentInput.value = "";
+  addMessage(email, message);
+  chatForm.reset();
 });
