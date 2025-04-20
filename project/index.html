@@ -8,22 +8,34 @@
 </head>
 <body>
   <div class="chat-container">
+    <div class="header">
+      <h2>Chatroom</h2>
+      <button id="dark-mode-toggle">🌙</button>
+    </div>
     <div id="chat-messages" class="chat-messages"></div>
-
     <form id="chat-form" class="chat-form">
       <input type="email" id="email" placeholder="Voer je e-mailadres in" required>
-      <textarea id="message" placeholder="Typ je bericht..." required></textarea>
-      <button type="submit">Verzenden</button>
+      <div class="message-input-container">
+        <textarea id="message" placeholder="Typ je bericht..." required></textarea>
+        <button type="button" id="record-btn" class="record-btn">🎤</button>
+      </div>
+      <div class="button-container">
+        <button type="submit">Verzenden</button>
+        <button type="button" id="gif-btn">GIF zoeken</button>
+        <button type="button" id="reset-btn">Reset Chat</button>
+      </div>
     </form>
   </div>
-
   <div id="gif-modal" class="modal">
     <div class="modal-content">
       <span id="close-modal" class="close">&times;</span>
+      <div class="gif-search-container">
+        <input type="text" id="gif-search" placeholder="Zoek GIFs met trefwoorden...">
+        <button id="gif-search-btn">Zoeken</button>
+      </div>
       <div id="gif-container" class="gif-container"></div>
     </div>
   </div>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <script src="scrips/scripts.js"></script>
 </body>
